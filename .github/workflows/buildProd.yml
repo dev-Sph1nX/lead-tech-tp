@@ -2,7 +2,7 @@ name: buildProd
 on:
   push:
     branches:
-      - release
+      - main
 
 permissions:
   contents: read
@@ -27,5 +27,5 @@ jobs:
 
       - name: Build the production Docker image
         run: |
-          docker build . --tag ghcr.io/dev-sph1nx/lead-dev:production  # Tag de l'image : production
-          docker push ghcr.io/dev-sph1nx/lead-dev:production  # Pousser l'image taggée production
+          docker build . --tag ghcr.io/dev-sph1nx/lead-dev:production
+          docker push ghcr.io/dev-sph1nx/lead-dev:production
