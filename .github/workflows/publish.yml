@@ -24,6 +24,6 @@ jobs:
 
       - name: Build the hello-docker Docker image
         run: |
-          docker build . --tag ghcr.io/dev-Sph1nX/lead-dev:staging
-          docker run ghcr.io/dev-Sph1nX/lead-dev:staging
-          docker push ghcr.io/dev-Sph1nX/lead-dev:staging
+          docker build . --tag ghcr.io/dev-sph1nX/lead-dev:staging
+          docker run ghcr.io/dev-sph1nX/lead-dev:staging
+          docker push ghcr.io/dev-sph1nX/lead-dev:staging
