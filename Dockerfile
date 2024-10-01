@@ -1,5 +1,14 @@
+# FROM node:alpine
+# COPY . /app
+# WORKDIR /app
+# RUN npm install
+# CMD node server.js
+
 FROM node:alpine
-COPY . /app
 WORKDIR /app
-RUN npm install
-CMD node server.js
+
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+
+CMD ["node", "server.js"]
