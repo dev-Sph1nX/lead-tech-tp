@@ -6,8 +6,6 @@ var COST_PER_REQUEST = 3;
 
 let client = null;
 
-const tokenBuckets = new Map();
-
 async function initClient() {
   client = await createClient({
     password: process.env.REDIS_PWD,

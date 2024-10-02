@@ -91,18 +91,16 @@ async function createAndUploadZip(photos, tags) {
   });
 }
 
-function listenForMessages(subscriptionNameOrId, timeout) {
+function listenForMessages(subscriptionNameOrId) {
   // References an existing subscription; if you are unsure if the
   // subscription will exist, try the optimisticSubscribe sample.
   const subscription = pubSubClient.subscription(subscriptionNameOrId);
 
   // Create an event handler to handle messages
-  let messageCount = 0;
   const messageHandler = async message => {
     console.log(`Received message ${message.id}:`);
     console.log(`\tData: ${message.data}`);
     console.log(`\tAttributes: ${message.attributes}`);
-    messageCount += 1;
     message.ack();
 
     const data = JSON.parse(message.data);
