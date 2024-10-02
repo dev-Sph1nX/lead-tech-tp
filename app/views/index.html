@@ -1,23 +1,150 @@
 <%- include("_header.html") -%>
 
-
 <div class="container">
-
-  <%- include("_search_form.html") -%>
-
-  <% if (invalidParameters) { %>
-    <div class="alert alert-danger">
-      <strong>Invalid value for "tags" or "tagmode" input parameters</strong><br><br>
-      Tags should be formatted as a comma delimited list containing only letters, commas, and spaces.
-      Tag Mode must equal "all" or "any".
+  <div class="panel panel-default search-results">
+    <div class="panel-heading">
+      <h3 class="panel-title">Zips disponibles en local</h3>
     </div>
-  <% } %>
+    <div class="panel-body">
+      <% if (jobStatus) { %> <% Object.entries(jobStatus).forEach(function([key,
+      value]) { %>
+      <div>
+        <span><%= key %></span>
+        :
+        <a href="<%= value.url %>" target="_blank">Download zip</a>
+      </div>
+      <% }) %> <% } %>
+    </div>
+  </div>
 
-  <% if (searchResults) { %>
-    <%- include("_search_results.html") -%>
-  <% } %>
+  <div class="panel panel-default search-results">
+    <div class="panel-heading">
+      <h3 class="panel-title">Zips disponibles depuis Firebase</h3>
+    </div>
+    <div class="panel-body">
+      <div id="firebase-zips"></div>
+    </div>
+  </div>
 
+  <%- include("_search_form.html") -%> <% if (invalidParameters) { %>
+  <div class="alert alert-danger">
+    <strong>Invalid value for "tags" or "tagmode" input parameters</strong
+    ><br /><br />
+    Tags should be formatted as a comma delimited list containing only letters,
+    commas, and spaces. Tag Mode must equal "all" or "any".
+  </div>
+  <% } %> <% if (searchResults) { %> <%- include("_search_results.html") -%> <%
+  } %>
 </div>
 
-
 <%- include("_footer.html") -%>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js';
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithPopup,
+    GoogleAuthProvider,
+    signOut
+  } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js';
+  import {
+    getDatabase,
+    ref,
+    onValue
+  } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: 'AIzaSyBMRbEW18ViCFCVdLS6lyoMfx0Z9ZGgW9U',
+    authDomain: 'dmii-2024.firebaseapp.com',
+    projectId: 'dmii-2024',
+    storageBucket: 'dmii-2024.appspot.com',
+    messagingSenderId: '871398193932',
+    appId: '1:871398193932:web:4b9e45e35be93526b96729',
+    databaseURL:
+      'https://dmii-2024-default-rtdb.europe-west1.firebasedatabase.app'
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const db = getDatabase(app);
+  const dbRef = ref(db, 'lucas');
+
+  const downloadForm = document.getElementById('download-form');
+  const loginButton = document.getElementById('login-button');
+  const logoutButton = document.getElementById('logout-button');
+  const userInfo = document.getElementById('user-info');
+  const firebaseZipsContainer = document.getElementById('firebase-zips');
+
+  onValue(dbRef, snapshot => {
+    const data = snapshot.val();
+    firebaseZipsContainer.innerHTML = ''; // Vider la section avant de la remplir
+
+    if (data) {
+      // Parcourir chaque timestamp
+      Object.entries(data).forEach(([timestamp, zips]) => {
+        // Parcourir chaque tag sous le timestamp
+        Object.entries(zips).forEach(([tag, zipInfo]) => {
+          // Créer un élément div pour chaque fichier zip
+          const zipDiv = document.createElement('div');
+          zipDiv.innerHTML = `
+            <strong>${tag}</strong> : 
+            <a href="${zipInfo.url}" target="_blank">Download zip</a>
+          `;
+          firebaseZipsContainer.appendChild(zipDiv);
+        });
+      });
+    } else {
+      firebaseZipsContainer.innerHTML = '<p>Aucun fichier ZIP disponible.</p>';
+    }
+  });
+
+  // Vérifier l'état de connexion de l'utilisateur
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      // Si l'utilisateur est connecté, afficher le bouton "Download"
+      if (downloadForm) downloadForm.style.display = 'block';
+      if (loginButton) loginButton.style.display = 'none';
+      if (logoutButton) logoutButton.style.display = 'block';
+      if (userInfo) {
+        userInfo.style.display = 'block';
+        userInfo.textContent = `Connecté en tant que ${user.email}`;
+      }
+    } else {
+      // Si l'utilisateur n'est pas connecté, afficher le bouton "Se connecter"
+      if (downloadForm) downloadForm.style.display = 'none';
+      if (loginButton) loginButton.style.display = 'block';
+      if (logoutButton) logoutButton.style.display = 'none';
+      if (userInfo) {
+        userInfo.style.display = 'none';
+        userInfo.textContent = '';
+      }
+    }
+  });
+
+  if (loginButton) {
+    loginButton.addEventListener('click', () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .then(result => {
+          console.log('Utilisateur connecté:', result.user);
+        })
+        .catch(error => {
+          console.error('Erreur de connexion:', error.message);
+        });
+    });
+  }
+
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      signOut(auth)
+        .then(() => {
+          console.log('Utilisateur déconnecté');
+        })
+        .catch(error => {
+          console.error('Erreur de déconnexion:', error.message);
+        });
+    });
+  }
+</script>
