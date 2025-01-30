@@ -1,3 +1,6 @@
+
+Réalisé dans le cadre du cours de lead dev qui m'a été dispensée pendant mon M2 
+
 # express-app-testing-demo
 
 This project is a simple express app for demonstrating testing and code coverage.
@@ -5,8 +8,6 @@ This project is a simple express app for demonstrating testing and code coverage
 [Supertest](https://github.com/visionmedia/supertest) are used for testing.
 Jest is also used for mocking functions and measuring code coverage.
 Note that this app only focuses on server-side JavaScript testing.
-
-Réalisé dans le cadre du cours de lead dev qui m'a été dispensée pendant mon M2 
 
 ## Requirements
 
